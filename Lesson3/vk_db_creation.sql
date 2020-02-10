@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY, -- SERIAL = BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE
     firstname VARCHAR(50),
-    lastname VARCHAR(50) COMMENT 'Фамиль', -- COMMENT на случай, если имя неочевидное
+    lastname VARCHAR(50) COMMENT 'Фамильия', -- COMMENT на случай, если имя неочевидное
     email VARCHAR(120) UNIQUE,
     phone BIGINT, 
     INDEX users_phone_idx(phone), -- как выбирать индексы?
@@ -124,7 +124,6 @@ CREATE TABLE `photo_albums` (
 	`id` SERIAL,
 	`name` varchar(255) DEFAULT NULL,
     `user_id` BIGINT UNSIGNED DEFAULT NULL,
-
     FOREIGN KEY (user_id) REFERENCES users(id),
   	PRIMARY KEY (`id`)
 );
@@ -138,3 +137,44 @@ CREATE TABLE `photos` (
 	FOREIGN KEY (album_id) REFERENCES photo_albums(id),
     FOREIGN KEY (media_id) REFERENCES media(id)
 );
+
+
+
+DROP TABLE IF EXISTS `presents`; -- Таблица подарков
+CREATE TABLE `presents` (
+	`id` SERIAL PRIMARY KEY,
+	`icon` TEXT NOT null -- Путь на иконку подарка
+);
+
+
+DROP TABLE IF EXISTS `user_presents`; -- Отношения подарков 
+CREATE TABLE `user_presents` (
+	`id` SERIAL PRIMARY KEY,
+	`user_id` BIGINT unsigned NOT NULL,
+	`user_id_from` BIGINT unsigned NOT NULL,
+	`present_id` BIGINT unsigned NOT NULL,
+	`created_at` DATETIME DEFAULT NOW(),
+	INDEX (user_id),
+	FOREIGN KEY (present_id) REFERENCES presents(id),
+	FOREIGN KEY (user_id) REFERENCES users(id),
+	FOREIGN KEY (user_id_from) REFERENCES users(id)
+);
+
+
+DROP TABLE IF EXISTS `user_info`; -- Расширнная таблица информации о пользователе
+CREATE TABLE `user_info` (
+	`id` SERIAL PRIMARY KEY,
+	`icon` TEXT NOT null, -- Путь на иконку подарка
+);
+
+
+DROP TABLE IF EXISTS `user_music_playlist`; -- Плейлист музыки 
+CREATE TABLE `user_music_playlist` (
+	`id` SERIAL PRIMARY KEY,
+	`name` varchar(255) DEFAULT NULL, -- название плейлиста 
+	`photo_id` BIGINT unsigned NOT NULL, -- обложка плейлиста, является фото
+	`media_id` BIGINT unsigned NOT NULL, -- Ссылка на музыкальный файл
+	FOREIGN KEY (photo_id) REFERENCES photos(id),
+	FOREIGN KEY (media_id) REFERENCES media(id)
+);
+
